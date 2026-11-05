@@ -1,0 +1,43 @@
+version: 2
+
+# github-actions has TWO entries so minor/patch and major PRs never suppress each
+# other (dependabot-core#14202). Dependabot only allows a second entry for the same
+# ecosystem and directory when `target-branch` differs, so the major entry names the
+# repository's default branch explicitly.
+
+updates:
+  # github-actions, entry 1 of 2: minor/patch (majors ignored).
+  - package-ecosystem: github-actions
+    # "/" does not cover local composite actions. Never use `**`: duplicate PRs.
+    directories:
+      - "/"
+      - "/.github/actions/*"
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+    groups:
+      actions-minor-patch:
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # github-actions, entry 2 of 2: majors only. Same directories as entry 1.
+  - package-ecosystem: github-actions
+    target-branch: main
+    directories:
+      - "/"
+      - "/.github/actions/*"
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+    groups:
+      actions-major:
+        update-types: ["major"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
